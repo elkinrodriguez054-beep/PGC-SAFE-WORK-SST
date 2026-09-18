@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema SST / SISO - Minería</title>
+    <style>
+        :root {
+            --verde-seguridad: #008744;
+            --amarillo-alerta: #F4A200;
+            --naranja-epp: #E65100;
+            --gris-socavon: #263238;
+            --fondo: #ECEFF1;
+            --blanco: #FFFFFF;
+            --texto-gris: #4A5568;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--fondo);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* VISTAS */
+        .pantalla {
+            display: none;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .pantalla.activa {
+            display: block;
+        }
+
+        /* TARJETAS DE LOGIN Y REGISTRO */
+        .card-form {
+            background: var(--blanco);
+            padding: 25px;
+            border-radius: 8px;
+            max-width: 450px;
+            margin: auto;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .login-card {
+            border-top: 8px solid var(--amarillo-alerta);
+        }
+
+        .registro-card {
+            border-top: 8px solid var(--naranja-epp);
+        }
+
+        h2 {
+            color: var(--gris-socavon);
+            text-align: center;
+            margin-bottom: 5px;
+            font-size: 22px;
+        }
+
+        .subtitulo {
+            color: var(--verde-seguridad);
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .grupo-campo {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--gris-socavon);
+            margin-bottom: 5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #CCC;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* BOTONES */
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .btn-verde { background: var(--verde-seguridad); color: var(--blanco); }
+        .btn-gris { background: var(--gris-socavon); color: var(--blanco); }
+        .btn-naranja { background: var(--naranja-epp); color: var(--blanco); }
+
+        /* PANELES PRINCIPALES */
+        .header {
+            background: var(--gris-socavon);
+            color: var(--blanco);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .header h3 { color: var(--amarillo-alerta); }
+
+        .contenido-panel {
+            background: var(--blanco);
+            padding: 20px;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* TABLA SISO */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #DDD;
+            padding: 10px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        th {
+            background-color: var(--amarillo-alerta);
+            color: var(--gris-socavon);
+        }
+
+        /* MODULOS TRABAJADOR */
+        .tarjeta-modulo {
+            border: 2px solid var(--amarillo-alerta);
+            background: var(--blanco);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-modulo h4 { color: var(--gris-socavon); margin-bottom: 5px; }
+        .info-modulo p { color: var(--texto-gris); font-size: 13px; }
+
+        .demo-info {
+            font-size: 12px;
+            text-align: center;
+            margin-top: 15px;
+            color: var(--texto-gris);
+        }
+    </style>
+</head>
+<body>
+
+<!-- 1. LOGIN -->
+<div id="pantalla-login" class="pantalla activa">
+    <div class="card-form login-card">
+        <h2>SAFE WORK SST</h2>
+        <div class="subtitulo">Control de Capacitación y Riesgos</div>
+
+        <div class="grupo-campo">
+            <label>Nombre completo:</label>
+            <input type="text" id="login-nombre" placeholder="Ej: Administrador SISO">
+        </div>
+
+        <div class="grupo-campo">
+            <label>Número de cédula:</label>
+            <input type="text" id="login-cedula" placeholder="Ej: 123456789">
+        </div>
+
+        <button class="btn btn-verde" onclick="iniciarSesion()">INICIAR SESIÓN</button>
+        <button class="btn btn-gris" onclick="mostrarPantalla('pantalla-registro')">REGISTRARSE</button>
+
+        <div class="demo-info">
+            <b>Usuarios de prueba:</b><br>
+            SISO: Cédula <code>123456789</code> | Nombre: <code>Administrador SISO</code><br>
+            Trabajador: Cédula <code>987654321</code> | Nombre: <code>Juan Pérez</code>
+        </div>
+    </div>
+</div>
+
+<!-- 2. REGISTRO -->
+<div id="pantalla-registro" class="pantalla">
+    <div class="card-form registro-card">
+        <h2 style="color: var(--naranja-epp);">REGISTRO DE PERSONAL</h2>
+        <br>
+        <div class="grupo-campo">
+            <label>Nombre completo:</label>
+            <input type="text" id="reg-nombre">
+        </div>
+        <div class="grupo-campo">
+            <label>Edad:</label>
+            <input type="number" id="reg-edad">
+        </div>
+        <div class="grupo-campo">
+            <label>Cargo en mina:</label>
+            <input type="text" id="reg-cargo">
+        </div>
+        <div class="grupo-campo">
+            <label>Número de cédula:</label>
+            <input type="text" id="reg-cedula">
+        </div>
+        <div class="grupo-campo">
+            <label>Rol de usuario:</label>
+            <select id="reg-rol">
+                <option value="SISO">SISO</option>
+                <option value="Trabajador">Trabajador</option>
+            </select>
+        </div>
+
+        <button class="btn btn-verde" onclick="guardarRegistro()">GUARDAR REGISTRO</button>
+        <button class="btn btn-gris" onclick="mostrarPantalla('pantalla-login')">VOLVER AL LOGIN</button>
+    </div>
+</div>
+
+<!-- 3. PANEL SISO -->
+<div id="pantalla-siso" class="pantalla">
+    <div class="header">
+        <h3 id="bienvenida-siso">PANEL SISO</h3>
+        <button class="btn btn-naranja" style="width: auto; margin: 0;" onclick="cerrarSesion()">CERRAR SESIÓN</button>
+    </div>
+    <div class="contenido-panel">
+        <h4 style="color: var(--verde-seguridad); margin-bottom: 15px;">Programar Nueva Capacitación SST en Mina</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <input type="text" id="cap-titulo" placeholder="Título de la capacitación">
+            <input type="text" id="cap-fecha" placeholder="Fecha (DD/MM/AAAA)">
+            <input type="text" id="cap-tema" placeholder="Tema de Seguridad">
+            <input type="text" id="cap-desc" placeholder="Descripción breve">
+        </div>
+        <button class="btn btn-verde" style="margin-top: 10px;" onclick="crearCapacitacion()">CREAR CAPACITACIÓN</button>
+
+        <h4 style="margin-top: 25px; color: var(--gris-socavon);">Capacitaciones Programadas</h4>
+        <table>
+            <thead>
+            <tr>
+                <th>Título</th>
+                <th>Descripción</th>
+                <th>Fecha</th>
+                <th>Tema Minero</th>
+            </tr>
+            </thead>
+            <tbody id="tabla-capacitaciones">
+            <tr>
+                <td>Uso de Autorrescatador y Lámpara</td>
+                <td>Protocolo de inspección de lámpara minera y manejo de kit.</td>
+                <td>20/09/2026</td>
+                <td>Equipos de Salvamento</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 4. PANEL TRABAJADOR -->
+<div id="pantalla-trabajador" class="pantalla">
+    <div class="header">
+        <h3 id="bienvenida-trabajador" style="color: white;">PANEL MINERO</h3>
+        <button class="btn btn-naranja" style="width: auto; margin: 0;" onclick="cerrarSesion()">CERRAR SESIÓN</button>
+    </div>
+    <div class="contenido-panel">
+        <h3 style="color: var(--verde-seguridad); margin-bottom: 15px;">MÓDULOS DE SEGURIDAD MINERA OBLIGATORIOS</h3>
+
+        <div class="tarjeta-modulo">
+            <div class="info-modulo">
+                <h4>1. Control e Inspección de Gases en Socavón</h4>
+                <p>Monitoreo de metano (grisú), monóxido de carbono y oxígeno con multidetectores.</p>
+            </div>
+            <button class="btn btn-verde" style="width: auto;" onclick="alert('Cargando Módulo 1...')">INGRESAR</button>
+        </div>
+
+        <div class="tarjeta-modulo">
+            <div class="info-modulo">
+                <h4>2. Uso Correcto de EPP para Minería Subterránea</h4>
+                <p>Casco con barbiquejo, lámpara de mina, autorrescatador y botas de puntera.</p>
+            </div>
+            <button class="btn btn-verde" style="width: auto;" onclick="alert('Cargando Módulo 2...')">INGRESAR</button>
+        </div>
+
+        <div class="tarjeta-modulo">
+            <div class="info-modulo">
+                <h4>3. Prevención de Sostenimiento y Derrumbes</h4>
+                <p>Identificación de fallas en entibado, arcos de acero y pernos de anclaje.</p>
+            </div>
+            <button class="btn btn-verde" style="width: auto;" onclick="alert('Cargando Módulo 3...')">INGRESAR</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // BASE DE DATOS EN MEMORIA LOCAL
+    const usuarios = [
+        { nombre: "Administrador SISO", edad: 30, cargo: "Inspector SST", cedula: "123456789", rol: "SISO" },
+        { nombre: "Juan Pérez", edad: 25, cargo: "Operario Socavón", cedula: "987654321", rol: "Trabajador" }
+    ];
+
+    function mostrarPantalla(id) {
+        document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
+        document.getElementById(id).classList.add('activa');
+    }
+
+    function iniciarSesion() {
+        const nombre = document.getElementById('login-nombre').value.trim();
+        const cedula = document.getElementById('login-cedula').value.trim();
+
+        const usuario = usuarios.find(u => u.cedula === cedula && u.nombre.toLowerCase() === nombre.toLowerCase());
+
+        if (!usuario) {
+            alert("Nombre o cédula incorrectos.");
+            return;
+        }
+
+        if (usuario.rol === "SISO") {
+            document.getElementById('bienvenida-siso').innerText = `PANEL SISO | ${usuario.nombre}`;
+            mostrarPantalla('pantalla-siso');
+        } else {
+            document.getElementById('bienvenida-trabajador').innerText = `TRABAJADOR: ${usuario.nombre} (${usuario.cargo})`;
+            mostrarPantalla('pantalla-trabajador');
+        }
+    }
+
+    function guardarRegistro() {
+        const nombre = document.getElementById('reg-nombre').value.trim();
+        const edad = document.getElementById('reg-edad').value.trim();
+        const cargo = document.getElementById('reg-cargo').value.trim();
+        const cedula = document.getElementById('reg-cedula').value.trim();
+        const rol = document.getElementById('reg-rol').value;
+
+        if (!nombre || !edad || !cargo || !cedula) {
+            alert("Por favor llene todos los campos.");
+            return;
+        }
+
+        if (usuarios.some(u => u.cedula === cedula)) {
+            alert("La cédula ya está registrada.");
+            return;
+        }
+
+        usuarios.push({ nombre, edad, cargo, cedula, rol });
+        alert("Usuario registrado correctamente.");
+        mostrarPantalla('pantalla-login');
+    }
+
+    function crearCapacitacion() {
+        const titulo = document.getElementById('cap-titulo').value.trim();
+        const fecha = document.getElementById('cap-fecha').value.trim();
+        const tema = document.getElementById('cap-tema').value.trim();
+        const desc = document.getElementById('cap-desc').value.trim();
+
+        if (!titulo || !fecha || !tema || !desc) {
+            alert("Complete los campos de la capacitación.");
+            return;
+        }
+
+        const tabla = document.getElementById('tabla-capacitaciones');
+        const fila = `<tr><td>${titulo}</td><td>${desc}</td><td>${fecha}</td><td>${tema}</td></tr>`;
+        tabla.innerHTML += fila;
+
+        document.getElementById('cap-titulo').value = '';
+        document.getElementById('cap-fecha').value = '';
+        document.getElementById('cap-tema').value = '';
+        document.getElementById('cap-desc').value = '';
+
+        alert("Capacitación agregada a la lista.");
+    }
+
+    function cerrarSesion() {
+        document.getElementById('login-nombre').value = '';
+        document.getElementById('login-cedula').value = '';
+        mostrarPantalla('pantalla-login');
+    }
+</script>
+</body>
+</html>
